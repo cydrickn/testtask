@@ -77,4 +77,9 @@ abstract class Controller extends BaseController
     {
         return \response()->json($data ?? [], 200, $headers ?? []);
     }
+
+    protected function validationErrorResponse(?array $data = null, ?array $headers = null): JsonResponse
+    {
+        return \response()->json($data ?? [], 422, $headers ?? []);
+    }
 }

@@ -3,6 +3,8 @@ declare(strict_types=1);
 
 namespace App\Database\Entities\MailChimp;
 
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use EoneoPay\Utils\Str;
 
@@ -91,6 +93,28 @@ class MailChimpList extends MailChimpEntity
     private $visibility;
 
     /**
+     * @ORM\OneToMany(targetEntity="MailChimpListMember", mappedBy="list", cascade={"remove"})
+     *
+     * @var ArrayCollection
+     */
+    private $members;
+
+    public function __construct(array $data = null)
+    {
+        parent::__construct($data);
+
+        $this->members = new ArrayCollection();
+    }
+
+    public function addMember(MailChimpListMember $member): self
+    {
+        $this->members->add($member);
+        $member->setList($this);
+
+        return $this;
+    }
+
+    /**
      * Get id.
      *
      * @return null|string
@@ -108,6 +132,15 @@ class MailChimpList extends MailChimpEntity
     public function getMailChimpId(): ?string
     {
         return $this->mailChimpId;
+    }
+
+    /**
+     *
+     * @return Collection
+     */
+    public function getMembers(): Collection
+    {
+        return $this->members;
     }
 
     /**
@@ -190,7 +223,7 @@ class MailChimpList extends MailChimpEntity
      *
      * @param string $mailChimpId
      *
-     * @return \App\Database\Entities\MailChimp\MailChimpList
+     * @return MailChimpList
      */
     public function setMailChimpId(string $mailChimpId): MailChimpList
     {
